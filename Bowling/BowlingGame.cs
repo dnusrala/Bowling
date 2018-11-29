@@ -4,8 +4,8 @@ namespace Bowling {
         private int _frame;
         private int _ball;
         private int _score;
-        private int _lastRollScore;
-        private int _mark;
+        private int _previousRollPins;
+        private int _markMultiplier = 1;
 
         public void Roll(int pins) {
             if (pins > 10) {
@@ -16,29 +16,31 @@ namespace Bowling {
                 throw new Exception("Pins cannot be negative");
             }
 
-            if (_lastRollScore + pins > 10 && _ball == 1) {
+            if (_previousRollPins + pins > 10 && _ball == 1) {
                 throw new Exception("Single frame score cannot exceed 10");
             }
 
-
-            if (_mark > 0) {
-                _score += pins;
-                _mark--;
-            }
-
-
-            _score = pins + _score;
+            _score += pins * _markMultiplier;
 
             //set fields for next roll
 
-            if (pins + _lastRollScore == 10 && _ball == 1) {
-                _mark = 1;
+            if (pins + _previousRollPins == 10 && _ball == 1) {
+                _markMultiplier = 2;
+            }
+
+            if (pins == 10 && _previousRollPins == 10 && _markMultiplier == 2) {
+                _markMultiplier = 3;
+                _frame++;
+                _ball = 0;
+                _previousRollPins = pins;
+                return;
             }
 
             if (pins == 10 && _ball == 0) {
-                _mark = 2;
+                _markMultiplier = 2;
                 _frame++;
                 _ball = 0;
+                _previousRollPins = pins;
                 return;
             }
 
@@ -50,9 +52,7 @@ namespace Bowling {
                 _frame++;
             }
 
-
-
-            _lastRollScore = pins;
+            _previousRollPins = pins;
         }
 
         public int GetScore() {

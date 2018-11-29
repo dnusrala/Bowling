@@ -5,78 +5,108 @@ using System;
 namespace BowlingTests {
     [TestFixture]
     public class BowlingTests {
+        private BowlingGame _bowling;
+
+        [SetUp]
+        public void SetUp() {
+            _bowling = new BowlingGame();
+
+        }
 
         [Test]
         public void ScoreStartsAtZero() {
-            var bowling = new BowlingGame();
-            var score = bowling.GetScore();
+            var score = _bowling.GetScore();
             Assert.AreEqual(0, score);
         }
 
         [Test]
         public void FirstRollPinCount() {
-            var bowling = new BowlingGame();
-            bowling.Roll(7);
-            var score = bowling.GetScore();
+            _bowling.Roll(7);
+            var score = _bowling.GetScore();
             Assert.AreEqual(7, score);
         }
 
         [Test]
         public void ScoreIsUnderTen() {
-            var bowling = new BowlingGame();
-            Assert.Throws<Exception>(() => bowling.Roll(11), "Pins cannot exceed 10");
+            Assert.Throws<Exception>(() => _bowling.Roll(11), "Pins cannot exceed 10");
         }
 
         [Test]
         public void ScoreIsNegative() {
-            var bowling = new BowlingGame();
-            Assert.Throws<Exception>(() => bowling.Roll(-1), "Pins cannot be negative");
+            Assert.Throws<Exception>(() => _bowling.Roll(-1), "Pins cannot be negative");
         }
 
         [Test]
         public void SingleFrameScore() {
-            var bowling = new BowlingGame();
-            bowling.Roll(2);
-            bowling.Roll(1);
-            var score = bowling.GetScore();
+            _bowling.Roll(2);
+            _bowling.Roll(1);
+            var score = _bowling.GetScore();
             Assert.AreEqual(3, score);
         }
 
         [Test]
         public void SingleFrameScoreMaxTen() {
-            var bowling = new BowlingGame();
-            bowling.Roll(3);
-            Assert.Throws<Exception>(() => bowling.Roll(8), "Single frame score cannot exceed 10");
+            _bowling.Roll(3);
+            Assert.Throws<Exception>(() => _bowling.Roll(8), "Single frame score cannot exceed 10");
 
         }
         [Test]
         public void ScoreAfterTwoFrames() {
-            var bowling = new BowlingGame();
-            bowling.Roll(7);
-            bowling.Roll(2);
-            bowling.Roll(5);
-            bowling.Roll(4);
-            var score = bowling.GetScore();
+            _bowling.Roll(7);
+            _bowling.Roll(2);
+            _bowling.Roll(5);
+            _bowling.Roll(4);
+            var score = _bowling.GetScore();
             Assert.AreEqual(18, score);
         }
 
         [Test]
         public void ScoreAfterSpare() {
-            var bowling = new BowlingGame();
-            bowling.Roll(1);
-            bowling.Roll(9);
-            bowling.Roll(5);
-            var score = bowling.GetScore();
+            _bowling.Roll(1);
+            _bowling.Roll(9);
+            _bowling.Roll(5);
+            var score = _bowling.GetScore();
             Assert.AreEqual(20, score);
         }
+
         [Test]
         public void ScoreAfterStrike() {
-            var bowling = new BowlingGame();
-            bowling.Roll(10);
-            bowling.Roll(4);
-            bowling.Roll(5);
-            var score = bowling.GetScore();
+            _bowling.Roll(10);
+            _bowling.Roll(4);
+            _bowling.Roll(5);
+            var score = _bowling.GetScore();
             Assert.AreEqual(28, score);
+        }
+
+        [Test]
+        public void ScoreAfterTwoStrikes() {
+            _bowling.Roll(10);
+            _bowling.Roll(10);
+            var score = _bowling.GetScore();
+            Assert.AreEqual(30, score);
+        }
+
+        [Test]
+        public void ScoreAfterThreeStrikes() {
+            _bowling.Roll(10);
+            _bowling.Roll(10);
+            _bowling.Roll(10);
+            var score = _bowling.GetScore();
+            Assert.AreEqual(60, score);
+        }
+
+        [TestCase(new[] { 5, 2, 3 }, 10)]
+        [TestCase(new[] { 1, 2, 3, 4 }, 10)]
+        [TestCase(new[] { 10, 10, 10, 0, 10, 10 }, 100)]
+        [TestCase(new[] { 10, 5, 5, 10, 5, 5, 10, 5, 5, 10 }, 130)]
+        [TestCase(new[] { 5, 5, 10, 5, 5, 10, 1, 9, 10, 9, 1, 10 }, 150)]
+        [TestCase(new[] { 0, 10, 5, 4}, 24)]
+        public void ScoreTest(int[] rolls, int expectedScore) {
+            foreach (var roll in rolls) {
+                _bowling.Roll(roll);
+            }
+
+            Assert.AreEqual(expectedScore, _bowling.GetScore());
         }
     }
 }
